@@ -3,12 +3,10 @@ package it.unikey.springsecuritydemo.login.security.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.unikey.springsecuritydemo.login.models.UserSpring;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+
 
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +36,7 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
+    //metodo per costruirsi uno oggetto di tipo UserDetailsImpl a partire da uno User storato nel database
     public static UserDetailsImpl build(UserSpring user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))

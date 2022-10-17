@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+//fornisce le api per la registrazione, il login ed il logout
 @CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
@@ -47,20 +49,31 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    //LOGIN
+    //1. autenticazione tramite username e password
+    //2. utilizza l'autenticazione del .1 per aggiornare la sicurezza
+    //3. si prende lo userDetails dall'oggetto dell'autenticazione
+    //4. genera il cookie tramite lo userDetail
+    //5. restituisce una risposta contente il jwt e i dati dello user
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        //1.
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
+        //2.
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        //3.
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
+        //4.
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
         List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
 
+        //5.
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(new UserInfoResponse(
                         userDetails.getId(),
@@ -69,8 +82,14 @@ public class AuthController {
                         roles));
     }
 
+    //REGISTRAZIONE
+    //1. controlla se username o email sono gia presenti nel database
+    //2. crea un nuovo user con il ruolo USER (se non specificato)
+    //3. salva lo user nel database tramite la repository
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
+
+        //1.
         if(userSpringRepository.existsByUsername(signupRequest.getUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("error: username in use"));
         }
@@ -79,6 +98,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
+        //2.
         UserSpring userSpring = new UserSpring(signupRequest.getUsername(),
                                                 signupRequest.getEmail(),
                                                 passwordEncoder.encode(signupRequest.getPassword()));
@@ -90,7 +110,6 @@ public class AuthController {
             RoleSpring userRoleSpring = roleSpringRepository.findByName(ERole.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Error: role not found"));
             roleSprings.add(userRoleSpring);
-
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
@@ -113,11 +132,14 @@ public class AuthController {
         }
 
         userSpring.setRoles(roleSprings);
-        userSpringRepository.save(userSpring);
 
+        //3.
+        userSpringRepository.save(userSpring);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
+    //LOGOUT
+    //pulisce i cookie
     @PostMapping("/signout")
     public ResponseEntity<?> logoutUser() {
         ResponseCookie responseCookie = jwtUtils.getCleanJwtCookie();

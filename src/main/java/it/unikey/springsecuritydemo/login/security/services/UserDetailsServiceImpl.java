@@ -11,11 +11,14 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+//implementando UserDetailsService ci viene fornito il metodo loadUserByUsername che utilizziamo tramite la repository
+//per salvarci l'utente con quell'username e poi buildarlo tramite UserDetailsImpl.
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserSpringRepository userRepository;
+
 
     @Override
     @Transactional

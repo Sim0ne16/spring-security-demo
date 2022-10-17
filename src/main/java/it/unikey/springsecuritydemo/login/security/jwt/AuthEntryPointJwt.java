@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
+//implementa AuthenticationEntryPoint che fornisce il metodo commence() che viene
+//triggherato ogni volta che uno user senza autenticazione proverà ad acceder ad una api con
+//protezione
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
@@ -21,4 +25,5 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         logger.error("Unauthorized error: {}", authException.getMessage());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     }
+    //SC_UNAUTHORIZED è la risposta con il codice 401 che indica proprio il non essere autorizzato
 }

@@ -16,6 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
+//OncePerRequestFilter permette ad ogni esecuzione della richieste di svolgere determiate cose:
+//tramite l'implementazione di doFilterInternal() permette di parsare e validare i JWT
 public class AuthTokenFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwtUtils;
@@ -28,16 +31,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
+            String jwt = parseJwt(request);  //si prende il token dalla richiesta
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {  //se ok
+                String username = jwtUtils.getUserNameFromJwtToken(jwt); //prende lo user dalla richiesta
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);  //se c'è uno user con questo username lo builda
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,
-                                userDetails.getAuthorities());
+                                userDetails.getAuthorities());  //controlla se lo user ha le autorizzazioni per accedere
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

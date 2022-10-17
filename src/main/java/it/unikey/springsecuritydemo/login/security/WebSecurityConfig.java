@@ -18,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+//offre impostazione per configurare cors, gestione della sessione
+//e le regole per le risorse protette!!
+
 
 @Configuration
 @EnableGlobalMethodSecurity(
@@ -57,6 +60,8 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    //SecurityFilterChain ha preso il posto del metodo configure in quando l'interfaccia che lo definisce è deprecata
+    //da spring security 2.7 -> component based approach
    @Bean
    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.cors().and().csrf().disable()

@@ -13,6 +13,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+
+//ha 3 funzioni principali:
+//1. generare un cookie contenente un jwt dallo username, data, scadenza e secretkey
+//2.
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -21,11 +25,12 @@ public class JwtUtils {
     private String jwtSecret;
 
     @Value("${springsecuritydemo.app.jwtExpirationMs}")
-    private int jwtExpirationMs;
+    private int jwtExpirationMs;  //data di scadenza
 
     @Value("${springsecuritydemo.app.jwtCookieName}")
     private String jwtCookie;
 
+    //prende il jwt dai cookie tramite il nome del cookie (che abbiamo specificato nelle properties)
     public String getJwtFromCookies(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, jwtCookie);
         if (cookie != null) {
@@ -35,21 +40,25 @@ public class JwtUtils {
         }
     }
 
+    //genera il cookie partendo dal token (a sua volta generato dallo username) e jwtCookie
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
         ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
         return cookie;
     }
 
+    //reitorna un cookie nullo (si usa per pulire i cookie)
     public ResponseCookie getCleanJwtCookie() {
         ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
         return cookie;
     }
 
+    //ci prendiamo lo user dal cookie
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 
+    //validiamo il jwt tramite la secretKey (sempre specificata nelle properties nel nostro caso)
     public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
@@ -69,6 +78,7 @@ public class JwtUtils {
         return false;
     }
 
+    //viene richiamo per generare il jwtCookie
     public String generateTokenFromUsername(String username) {
         return Jwts.builder()
                 .setSubject(username)
