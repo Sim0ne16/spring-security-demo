@@ -60,7 +60,7 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //SecurityFilterChain ha preso il posto del metodo configure in quando l'interfaccia che lo definisce è deprecata
+    //SecurityFilterChain ha preso il posto del metodo configure in quanto l'interfaccia che lo definisce è deprecata
     //da spring security 2.7 -> component based approach
    @Bean
    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{

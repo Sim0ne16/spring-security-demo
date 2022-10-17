@@ -55,7 +55,6 @@ public class AuthController {
     //3. si prende lo userDetails dall'oggetto dell'autenticazione
     //4. genera il cookie tramite lo userDetail
     //5. restituisce una risposta contente il jwt e i dati dello user
-
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 

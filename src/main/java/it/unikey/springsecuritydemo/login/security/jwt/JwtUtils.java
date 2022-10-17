@@ -13,10 +13,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-
-//ha 3 funzioni principali:
-//1. generare un cookie contenente un jwt dallo username, data, scadenza e secretkey
-//2.
+//fornisce 5 metodi principali:
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -47,7 +44,7 @@ public class JwtUtils {
         return cookie;
     }
 
-    //reitorna un cookie nullo (si usa per pulire i cookie)
+    //ritorna un cookie nullo (si usa per pulire i cookie)
     public ResponseCookie getCleanJwtCookie() {
         ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/api").build();
         return cookie;
